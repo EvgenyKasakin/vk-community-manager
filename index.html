@@ -1,0 +1,3473 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>VK Community Manager Pro</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.1/chart.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
+    <style>
+        :root {
+            --system-gray: #8E8E93;
+            --system-gray2: #AEAEB2;
+            --system-gray3: #C7C7CC;
+            --system-gray4: #D1D1D6;
+            --system-gray5: #E5E5EA;
+            --system-gray6: #F2F2F7;
+            --system-blue: #007AFF;
+            --system-green: #34C759;
+            --system-red: #FF3B30;
+            --system-orange: #FF9500;
+            --system-yellow: #FFCC00;
+            --system-teal: #5AC8FA;
+            --system-indigo: #5856D6;
+            --system-purple: #AF52DE;
+            --system-pink: #FF2D55;
+            --vk-blue: #0077FF;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: #F2F2F7;
+            color: #000;
+            padding-bottom: 80px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 0 16px;
+        }
+
+        .header {
+            position: sticky;
+            top: 0;
+            background-color: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            padding: 12px 0;
+            border-bottom: 1px solid var(--system-gray5);
+            z-index: 100;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .title {
+            font-size: 17px;
+            font-weight: 600;
+            text-align: center;
+            flex: 1;
+        }
+
+        .header-action {
+            font-size: 15px;
+            color: var(--vk-blue);
+            min-width: 60px;
+        }
+
+        .header-action.left {
+            text-align: left;
+        }
+
+        .header-action.right {
+            text-align: right;
+        }
+
+        .card {
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            margin: 16px 0;
+            overflow: hidden;
+        }
+
+        .card-header {
+            padding: 16px;
+            border-bottom: 1px solid var(--system-gray6);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .card-title {
+            font-size: 17px;
+            font-weight: 600;
+        }
+
+        .card-subtitle {
+            font-size: 13px;
+            color: var(--system-gray);
+            margin-top: 4px;
+        }
+
+        .card-content {
+            padding: 16px;
+        }
+
+        .section-title {
+            font-size: 22px;
+            font-weight: 700;
+            margin: 24px 0 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .section-subtitle {
+            font-size: 15px;
+            color: var(--system-gray);
+            margin-top: -4px;
+            margin-bottom: 16px;
+        }
+
+        .section-title .more-link {
+            font-size: 15px;
+            font-weight: 400;
+            color: var(--vk-blue);
+            text-decoration: none;
+        }
+
+        .button {
+            background-color: var(--vk-blue);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 8px 16px;
+            font-size: 15px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .button:hover {
+            background-color: #0066CC;
+        }
+
+        .button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .button.secondary {
+            background-color: var(--system-gray6);
+            color: var(--vk-blue);
+        }
+
+        .button.secondary:hover {
+            background-color: var(--system-gray5);
+        }
+
+        .button.danger {
+            background-color: var(--system-red);
+        }
+
+        .button.danger:hover {
+            background-color: #E0352B;
+        }
+
+        .button.small {
+            font-size: 13px;
+            padding: 6px 12px;
+        }
+
+        .button.icon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .button.icon i {
+            margin-right: 6px;
+        }
+
+        .tab-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background-color: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            display: flex;
+            justify-content: space-around;
+            padding: 10px 0;
+            border-top: 1px solid var(--system-gray5);
+            z-index: 50;
+        }
+
+        .tab {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: var(--system-gray);
+            text-decoration: none;
+            transition: all 0.2s ease;
+        }
+
+        .tab.active {
+            color: var(--vk-blue);
+        }
+
+        .tab-icon {
+            font-size: 24px;
+            margin-bottom: 4px;
+        }
+
+        .tab-label {
+            font-size: 10px;
+        }
+
+        .stat-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+        }
+
+        .stat-grid.cols-3 {
+            grid-template-columns: repeat(3, 1fr);
+        }
+
+        .stat-card {
+            background-color: #fff;
+            border-radius: 10px;
+            padding: 16px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .stat-value {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .stat-change {
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .stat-change.positive {
+            color: var(--system-green);
+        }
+
+        .stat-change.negative {
+            color: var(--system-red);
+        }
+
+        .stat-label {
+            font-size: 13px;
+            color: var(--system-gray);
+        }
+
+        .chart-container {
+            width: 100%;
+            height: 200px;
+            margin-top: 16px;
+        }
+        
+        .post {
+            display: flex;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--system-gray6);
+        }
+        
+        .post:last-child {
+            border-bottom: none;
+        }
+        
+        .post-image {
+            width: 60px;
+            height: 60px;
+            border-radius: 8px;
+            background-color: var(--system-gray5);
+            margin-right: 12px;
+            background-size: cover;
+            background-position: center;
+        }
+        
+        .post-content {
+            flex: 1;
+        }
+
+        .post-top {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 4px;
+        }
+
+        .post-date {
+            font-size: 12px;
+            color: var(--system-gray);
+        }
+
+        .post-actions {
+            display: flex;
+        }
+
+        .post-action {
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--system-gray);
+            margin-left: 8px;
+            cursor: pointer;
+        }
+
+        .post-action:hover {
+            color: var(--vk-blue);
+        }
+        
+        .post-text {
+            font-size: 15px;
+            margin-bottom: 4px;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        
+        .post-stats {
+            display: flex;
+            font-size: 13px;
+            color: var(--system-gray);
+        }
+        
+        .post-stat {
+            margin-right: 12px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .post-stat-icon {
+            margin-right: 4px;
+            font-size: 14px;
+        }
+        
+        .integration-card {
+            padding: 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--system-gray6);
+        }
+        
+        .integration-card:last-child {
+            border-bottom: none;
+        }
+        
+        .integration-info {
+            display: flex;
+            align-items: center;
+        }
+        
+        .integration-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            background-color: var(--system-gray5);
+            margin-right: 12px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 18px;
+        }
+        
+        .integration-make {
+            background-color: #0095FF;
+            color: white;
+        }
+        
+        .integration-pipedream {
+            background-color: #753BBD;
+            color: white;
+        }
+        
+        .integration-name {
+            font-size: 15px;
+            font-weight: 500;
+        }
+        
+        .integration-status {
+            font-size: 13px;
+            color: var(--system-gray);
+            margin-top: 2px;
+        }
+        
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 51px;
+            height: 31px;
+        }
+        
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: var(--system-gray4);
+            transition: .4s;
+            border-radius: 34px;
+        }
+        
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 27px;
+            width: 27px;
+            left: 2px;
+            bottom: 2px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        
+        input:checked + .slider {
+            background-color: var(--system-green);
+        }
+        
+        input:checked + .slider:before {
+            transform: translateX(20px);
+        }
+
+        /* Модальное окно в стиле Apple */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        .modal-content {
+            background-color: #fff;
+            border-radius: 14px;
+            width: 90%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow: hidden;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            transform: scale(0.9);
+            opacity: 0;
+            transition: all 0.3s ease;
+        }
+
+        .modal-scroll {
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        
+        .modal.active .modal-content {
+            transform: scale(1);
+            opacity: 1;
+        }
+        
+        .modal-header {
+            padding: 16px;
+            text-align: center;
+            border-bottom: 1px solid var(--system-gray6);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-header-left {
+            min-width: 60px;
+            text-align: left;
+        }
+
+        .modal-header-right {
+            min-width: 60px;
+            text-align: right;
+        }
+        
+        .modal-title {
+            font-size: 17px;
+            font-weight: 600;
+            flex: 1;
+        }
+        
+        .modal-body {
+            padding: 20px 16px;
+        }
+        
+        .modal-footer {
+            display: flex;
+            border-top: 1px solid var(--system-gray6);
+        }
+        
+        .modal-button {
+            flex: 1;
+            border: none;
+            background: none;
+            padding: 16px;
+            font-size: 17px;
+            color: var(--vk-blue);
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+        
+        .modal-button:hover {
+            background-color: var(--system-gray6);
+        }
+        
+        .modal-button.destructive {
+            color: var(--system-red);
+        }
+        
+        .modal-button.cancel {
+            font-weight: 600;
+        }
+        
+        .modal-button + .modal-button {
+            border-left: 1px solid var(--system-gray6);
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        /* Поля ввода в стиле Apple */
+        .form-group {
+            margin-bottom: 16px;
+        }
+        
+        .form-label {
+            display: block;
+            font-size: 15px;
+            font-weight: 500;
+            margin-bottom: 8px;
+        }
+        
+        .form-input {
+            width: 100%;
+            padding: 12px;
+            border-radius: 10px;
+            border: 1px solid var(--system-gray4);
+            font-size: 15px;
+            transition: all 0.2s ease;
+        }
+        
+        .form-input:focus {
+            outline: none;
+            border-color: var(--vk-blue);
+            box-shadow: 0 0 0 2px rgba(0, 119, 255, 0.1);
+        }
+
+        .form-row {
+            display: flex;
+            gap: 10px;
+        }
+
+        .form-row .form-group {
+            flex: 1;
+        }
+        
+        textarea.form-input {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        select.form-input {
+            appearance: none;
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%238E8E93' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            background-size: 16px;
+            padding-right: 40px;
+        }
+        
+        .sections {
+            display: none;
+        }
+        
+        .section {
+            display: none;
+        }
+        
+        .section.active {
+            display: block;
+        }
+        
+        /* Состояние загрузки */
+        .loading {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(255, 255, 255, 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+        
+        .loading.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+        
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: 3px solid var(--system-gray4);
+            border-top-color: var(--vk-blue);
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Segmented control */
+        .segmented-control {
+            display: flex;
+            background-color: var(--system-gray6);
+            border-radius: 8px;
+            padding: 2px;
+            margin-bottom: 16px;
+        }
+
+        .segment {
+            flex: 1;
+            text-align: center;
+            padding: 8px 16px;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            border-radius: 6px;
+            transition: all 0.2s ease;
+        }
+
+        .segment.active {
+            background-color: white;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Badge */
+        .badge {
+            display: inline-block;
+            font-size: 12px;
+            font-weight: 500;
+            padding: 2px 6px;
+            border-radius: 10px;
+            margin-left: 6px;
+            background-color: var(--system-gray5);
+            color: var(--system-gray);
+        }
+
+        .badge.primary {
+            background-color: var(--vk-blue);
+            color: white;
+        }
+
+        .badge.success {
+            background-color: var(--system-green);
+            color: white;
+        }
+
+        .badge.warning {
+            background-color: var(--system-orange);
+            color: white;
+        }
+
+        .badge.danger {
+            background-color: var(--system-red);
+            color: white;
+        }
+
+        /* Media grid */
+        .media-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+        }
+
+        .media-item {
+            position: relative;
+            border-radius: 8px;
+            padding-top: 100%;
+            background-color: var(--system-gray5);
+            background-size: cover;
+            background-position: center;
+        }
+
+        .media-type {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            width: 24px;
+            height: 24px;
+            background-color: rgba(0, 0, 0, 0.5);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+        }
+
+        .media-select {
+            position: absolute;
+            bottom: 8px;
+            left: 8px;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            border: 2px solid white;
+            background-color: transparent;
+            cursor: pointer;
+        }
+
+        .media-select.selected {
+            background-color: var(--vk-blue);
+            border-color: var(--vk-blue);
+        }
+
+        .media-select.selected:after {
+            content: "✓";
+            color: white;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+        }
+
+        /* Search */
+        .search-container {
+            margin-bottom: 16px;
+            position: relative;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 10px 16px 10px 40px;
+            border-radius: 10px;
+            border: none;
+            background-color: var(--system-gray6);
+            font-size: 15px;
+            transition: all 0.2s ease;
+        }
+
+        .search-input:focus {
+            outline: none;
+            background-color: var(--system-gray5);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--system-gray);
+            font-size: 16px;
+        }
+
+        /* Tags */
+        .tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+
+        .tag {
+            display: flex;
+            align-items: center;
+            background-color: var(--system-gray6);
+            border-radius: 16px;
+            padding: 6px 12px;
+            font-size: 13px;
+        }
+
+        .tag-remove {
+            margin-left: 6px;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background-color: var(--system-gray4);
+            color: var(--system-gray);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            cursor: pointer;
+        }
+
+        .tag-remove:hover {
+            background-color: var(--system-gray3);
+        }
+
+        /* Menu */
+        .menu {
+            position: absolute;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            z-index: 100;
+            overflow: hidden;
+            min-width: 180px;
+            opacity: 0;
+            transform: scale(0.95);
+            transform-origin: top right;
+            transition: all 0.2s ease;
+            pointer-events: none;
+        }
+
+        .menu.active {
+            opacity: 1;
+            transform: scale(1);
+            pointer-events: all;
+        }
+
+        .menu-item {
+            padding: 12px 16px;
+            font-size: 15px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+        }
+
+        .menu-item:hover {
+            background-color: var(--system-gray6);
+        }
+
+        .menu-item i {
+            margin-right: 10px;
+            width: 20px;
+            text-align: center;
+            font-size: 16px;
+        }
+
+        .menu-item.destructive {
+            color: var(--system-red);
+        }
+
+        .menu-divider {
+            height: 1px;
+            background-color: var(--system-gray6);
+        }
+
+        /* Аватарки */
+        .avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: var(--system-gray5);
+            background-size: cover;
+            background-position: center;
+            margin-right: 12px;
+        }
+
+        .avatar.small {
+            width: 32px;
+            height: 32px;
+        }
+
+        .avatar.large {
+            width: 60px;
+            height: 60px;
+        }
+
+        /* Action sheet */
+        .action-sheet {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            display: flex;
+            align-items: flex-end;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+
+        .action-sheet.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .action-sheet-content {
+            background-color: #F2F2F7;
+            border-radius: 10px 10px 0 0;
+            width: 100%;
+            padding: 8px 0;
+            transform: translateY(100%);
+            transition: transform 0.3s ease;
+        }
+
+        .action-sheet.active .action-sheet-content {
+            transform: translateY(0);
+        }
+
+        .action-sheet-item {
+            padding: 16px;
+            text-align: center;
+            font-size: 17px;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+            background-color: white;
+            margin-bottom: 1px;
+        }
+
+        .action-sheet-item:hover {
+            background-color: var(--system-gray6);
+        }
+
+        .action-sheet-item.destructive {
+            color: var(--system-red);
+        }
+
+        .action-sheet-cancel {
+            padding: 16px;
+            text-align: center;
+            font-size: 17px;
+            font-weight: 600;
+            cursor: pointer;
+            background-color: white;
+            margin-top: 8px;
+        }
+
+        .action-sheet-cancel:hover {
+            background-color: var(--system-gray6);
+        }
+
+        /* User list item */
+        .user-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--system-gray6);
+        }
+
+        .user-item:last-child {
+            border-bottom: none;
+        }
+
+        .user-info {
+            flex: 1;
+        }
+
+        .user-name {
+            font-size: 15px;
+            font-weight: 500;
+        }
+
+        .user-status {
+            font-size: 13px;
+            color: var(--system-gray);
+            margin-top: 2px;
+        }
+
+        .user-action {
+            display: flex;
+            gap: 8px;
+        }
+
+        /* Tab content */
+        .tabs-wrapper {
+            margin-bottom: 16px;
+        }
+
+        .tabs-header {
+            display: flex;
+            border-bottom: 1px solid var(--system-gray5);
+            margin-bottom: 16px;
+        }
+
+        .tab-header-item {
+            padding: 12px 16px;
+            font-size: 15px;
+            font-weight: 500;
+            cursor: pointer;
+            color: var(--system-gray);
+            border-bottom: 2px solid transparent;
+            transition: all 0.2s ease;
+        }
+
+        .tab-header-item.active {
+            color: var(--vk-blue);
+            border-bottom-color: var(--vk-blue);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Товары */
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+        }
+
+        .product-card {
+            background-color: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .product-image {
+            width: 100%;
+            padding-top: 100%;
+            background-color: var(--system-gray5);
+            background-size: cover;
+            background-position: center;
+        }
+
+        .product-info {
+            padding: 12px;
+        }
+
+        .product-price {
+            font-weight: 600;
+            font-size: 16px;
+            margin-bottom: 4px;
+        }
+
+        .product-title {
+            font-size: 14px;
+            margin-bottom: 4px;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .product-status {
+            font-size: 12px;
+            color: var(--system-gray);
+        }
+
+        /* Мероприятия */
+        .event-card {
+            margin-bottom: 16px;
+            background-color: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .event-cover {
+            width: 100%;
+            height: 150px;
+            background-color: var(--system-gray5);
+            background-size: cover;
+            background-position: center;
+        }
+
+        .event-content {
+            padding: 16px;
+        }
+
+        .event-date {
+            font-size: 13px;
+            color: var(--vk-blue);
+            font-weight: 500;
+            margin-bottom: 4px;
+        }
+
+        .event-title {
+            font-size: 17px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .event-info {
+            display: flex;
+            align-items: center;
+            font-size: 13px;
+            color: var(--system-gray);
+            margin-bottom: 4px;
+        }
+
+        .event-info i {
+            margin-right: 6px;
+            width: 16px;
+            text-align: center;
+        }
+
+        .event-footer {
+            display: flex;
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px solid var(--system-gray6);
+        }
+
+        .event-stat {
+            display: flex;
+            align-items: center;
+            margin-right: 16px;
+            font-size: 13px;
+            color: var(--system-gray);
+        }
+
+        .event-stat i {
+            margin-right: 4px;
+        }
+
+        /* Сообщения */
+        .message-list {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .message {
+            max-width: 80%;
+            padding: 10px 14px;
+            border-radius: 18px;
+            margin-bottom: 8px;
+            font-size: 15px;
+        }
+
+        .message.incoming {
+            align-self: flex-start;
+            background-color: var(--system-gray6);
+        }
+
+        .message.outgoing {
+            align-self: flex-end;
+            background-color: var(--vk-blue);
+            color: white;
+        }
+
+        .message-time {
+            font-size: 11px;
+            margin-top: 4px;
+            color: var(--system-gray);
+            text-align: right;
+        }
+
+        .message.outgoing .message-time {
+            color: rgba(255,255,255,0.7);
+        }
+
+        .message-input-container {
+            display: flex;
+            align-items: center;
+            background-color: var(--system-gray6);
+            border-radius: 20px;
+            padding: 4px;
+            margin-top: 8px;
+        }
+
+        .message-input {
+            flex: 1;
+            border: none;
+            background-color: transparent;
+            padding: 8px 12px;
+            font-size: 15px;
+        }
+
+        .message-input:focus {
+            outline: none;
+        }
+
+        .message-send {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background-color: var(--vk-blue);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            cursor: pointer;
+        }
+
+        /* Заголовок окна диалогов */
+        .conversation-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .conversation-info {
+            flex: 1;
+        }
+
+        .conversation-name {
+            font-size: 17px;
+            font-weight: 600;
+        }
+
+        .conversation-status {
+            font-size: 13px;
+            color: var(--system-green);
+        }
+
+        /* Рекламные кампании */
+        .ad-card {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            margin-bottom: 16px;
+            overflow: hidden;
+        }
+
+        .ad-header {
+            padding: 16px;
+            border-bottom: 1px solid var(--system-gray6);
+        }
+
+        .ad-title {
+            font-size: 17px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .ad-date {
+            font-size: 13px;
+            color: var(--system-gray);
+            display: flex;
+            align-items: center;
+        }
+
+        .ad-date i {
+            margin-right: 4px;
+        }
+
+        .ad-body {
+            padding: 16px;
+        }
+
+        .ad-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .ad-stat {
+            text-align: center;
+        }
+
+        .ad-stat-value {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 2px;
+        }
+
+        .ad-stat-label {
+            font-size: 12px;
+            color: var(--system-gray);
+        }
+
+        .ad-footer {
+            display: flex;
+            border-top: 1px solid var(--system-gray6);
+        }
+
+        .ad-action {
+            flex: 1;
+            text-align: center;
+            padding: 12px;
+            font-size: 14px;
+            color: var(--vk-blue);
+            cursor: pointer;
+        }
+
+        .ad-action + .ad-action {
+            border-left: 1px solid var(--system-gray6);
+        }
+
+        .ad-status {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 500;
+            margin-left: 8px;
+        }
+
+        .ad-status.active {
+            background-color: rgba(52, 199, 89, 0.1);
+            color: var(--system-green);
+        }
+
+        .ad-status.paused {
+            background-color: rgba(255, 149, 0, 0.1);
+            color: var(--system-orange);
+        }
+
+        .ad-status.finished {
+            background-color: rgba(142, 142, 147, 0.1);
+            color: var(--system-gray);
+        }
+
+        /* Target badge on segment headers */
+        .target-badge {
+            position: absolute;
+            top: -6px;
+            right: -6px;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background-color: var(--system-red);
+            color: white;
+            font-size: 10px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* для скрытия и показа контента */
+        .hidden {
+            display: none !important;
+        }
+
+        /* График активности */
+        .activity-heatmap {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 4px;
+            margin-top: 16px;
+        }
+
+        .heatmap-day {
+            margin-bottom: 4px;
+            font-size: 11px;
+            color: var(--system-gray);
+            text-align: center;
+        }
+
+        .heatmap-row {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 4px;
+            margin-bottom: 4px;
+        }
+
+        .heatmap-cell {
+            aspect-ratio: 1/1;
+            border-radius: 2px;
+            background-color: var(--system-gray6);
+        }
+
+        .heatmap-cell.level-1 {
+            background-color: #E3F2FD;
+        }
+
+        .heatmap-cell.level-2 {
+            background-color: #90CAF9;
+        }
+
+        .heatmap-cell.level-3 {
+            background-color: #2196F3;
+        }
+
+        .heatmap-cell.level-4 {
+            background-color: #1565C0;
+        }
+
+        .heatmap-time {
+            font-size: 11px;
+            color: var(--system-gray);
+        }
+
+        /* Пользовательский контент */
+        .content-preview {
+            margin-bottom: 16px;
+        }
+
+        .content-preview-image {
+            width: 100%;
+            height: 200px;
+            background-color: var(--system-gray5);
+            border-radius: 10px;
+            margin-bottom: 8px;
+            background-size: cover;
+            background-position: center;
+        }
+
+        .content-preview-stats {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .content-preview-stat {
+            font-size: 13px;
+            color: var(--system-gray);
+            display: flex;
+            align-items: center;
+        }
+
+        .content-preview-stat i {
+            margin-right: 4px;
+        }
+
+        /* Меню сообщества */
+        .menu-item-row {
+            display: flex;
+            align-items: center;
+            padding: 16px;
+            border-bottom: 1px solid var(--system-gray6);
+            cursor: pointer;
+        }
+
+        .menu-item-row:last-child {
+            border-bottom: none;
+        }
+
+        .menu-item-icon {
+            width: 28px;
+            height: 28px;
+            border-radius: 8px;
+            background-color: var(--vk-blue);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 16px;
+            font-size: 14px;
+        }
+
+        .menu-item-content {
+            flex: 1;
+        }
+
+        .menu-item-title {
+            font-size: 16px;
+            font-weight: 500;
+        }
+
+        .menu-item-subtitle {
+            font-size: 13px;
+            color: var(--system-gray);
+            margin-top: 2px;
+        }
+
+        .menu-item-arrow {
+            color: var(--system-gray3);
+            font-size: 20px;
+        }
+
+        /* Виджеты */
+        .widget-card {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            overflow: hidden;
+            margin-bottom: 16px;
+        }
+
+        .widget-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--system-gray6);
+        }
+
+        .widget-title {
+            font-size: 15px;
+            font-weight: 600;
+        }
+
+        .widget-content {
+            padding: 16px;
+        }
+
+        /* Комментарии */
+        .comment {
+            display: flex;
+            margin-bottom: 16px;
+        }
+
+        .comment-content {
+            flex: 1;
+        }
+
+        .comment-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 4px;
+        }
+
+        .comment-author {
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .comment-date {
+            font-size: 12px;
+            color: var(--system-gray);
+        }
+
+        .comment-text {
+            font-size: 14px;
+            margin-bottom: 4px;
+        }
+
+        .comment-actions {
+            display: flex;
+            font-size: 12px;
+            color: var(--system-gray);
+        }
+
+        .comment-action {
+            margin-right: 12px;
+            cursor: pointer;
+        }
+
+        .comment-action:hover {
+            color: var(--vk-blue);
+        }
+
+        .comment-replies {
+            padding-left: 40px;
+        }
+
+        /* Видео-плеер */
+        .video-player {
+            position: relative;
+            width: 100%;
+            border-radius: 10px;
+            overflow: hidden;
+            background-color: black;
+            margin-bottom: 16px;
+        }
+
+        .video-placeholder {
+            width: 100%;
+            padding-top: 56.25%;
+            background-color: var(--system-gray5);
+            position: relative;
+        }
+
+        .video-play {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+
+        .video-play i {
+            color: white;
+            font-size: 24px;
+        }
+
+        .video-info {
+            padding: 12px;
+            background-color: white;
+        }
+
+        .video-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .video-stats {
+            display: flex;
+            font-size: 13px;
+            color: var(--system-gray);
+        }
+
+        .video-stat {
+            display: flex;
+            align-items: center;
+            margin-right: 12px;
+        }
+
+        .video-stat i {
+            margin-right: 4px;
+        }
+
+        /* Tinder-like карточки для рекомендаций */
+        .recommendation-card {
+            position: relative;
+            width: 100%;
+            height: 300px;
+            border-radius: 16px;
+            background-color: var(--system-gray5);
+            background-size: cover;
+            background-position: center;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            overflow: hidden;
+            margin-bottom: 16px;
+        }
+
+        .recommendation-gradient {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 50%;
+            background: linear-gradient(to bottom, rgba(0,0,0,0) 0%, rgba(0,0,0,0.8) 100%);
+            padding: 20px 16px 16px;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+        }
+
+        .recommendation-title {
+            color: white;
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .recommendation-info {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 14px;
+            margin-bottom: 12px;
+        }
+
+        .recommendation-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .recommendation-button {
+            background-color: white;
+            border-radius: 20px;
+            padding: 8px 16px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+        }
+
+        .recommendation-button.primary {
+            background-color: var(--vk-blue);
+            color: white;
+        }
+
+        /* Календарь */
+        .calendar {
+            background-color: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            margin-bottom: 16px;
+        }
+
+        .calendar-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px;
+            border-bottom: 1px solid var(--system-gray6);
+        }
+
+        .calendar-title {
+            font-size: 17px;
+            font-weight: 600;
+        }
+
+        .calendar-nav {
+            display: flex;
+            gap: 16px;
+        }
+
+        .calendar-nav-button {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--system-gray);
+            cursor: pointer;
+        }
+
+        .calendar-nav-button:hover {
+            background-color: var(--system-gray6);
+        }
+
+        .calendar-weekdays {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            padding: 8px 16px;
+        }
+
+        .calendar-weekday {
+            text-align: center;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--system-gray);
+        }
+
+        .calendar-days {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            padding: 0 16px 16px;
+            gap: 8px;
+        }
+
+        .calendar-day {
+            aspect-ratio: 1/1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+
+        .calendar-day:hover {
+            background-color: var(--system-gray6);
+        }
+
+        .calendar-day.active {
+            background-color: var(--vk-blue);
+            color: white;
+        }
+
+        .calendar-day.has-event:before {
+            content: "";
+            position: absolute;
+            bottom: 2px;
+            width: 4px;
+            height: 4px;
+            border-radius: 50%;
+            background-color: var(--vk-blue);
+        }
+
+        .calendar-day.active.has-event:before {
+            background-color: white;
+        }
+
+        .calendar-day.other-month {
+            color: var(--system-gray3);
+        }
+
+        /* Аудио плеер */
+        .audio-player {
+            display: flex;
+            align-items: center;
+            background-color: white;
+            border-radius: 10px;
+            padding: 12px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            margin-bottom: 16px;
+        }
+
+        .audio-cover {
+            width: 48px;
+            height: 48px;
+            border-radius: 6px;
+            background-color: var(--system-gray5);
+            margin-right: 12px;
+        }
+
+        .audio-info {
+            flex: 1;
+            margin-right: 12px;
+        }
+
+        .audio-title {
+            font-size: 15px;
+            font-weight: 500;
+            margin-bottom: 2px;
+        }
+
+        .audio-artist {
+            font-size: 13px;
+            color: var(--system-gray);
+        }
+
+        .audio-controls {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .audio-control {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background-color: var(--system-gray6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+
+        .audio-control:hover {
+            background-color: var(--system-gray5);
+        }
+
+        .audio-control.play {
+            background-color: var(--vk-blue);
+            color: white;
+        }
+
+        .audio-timeline {
+            flex: 1;
+            height: 4px;
+            background-color: var(--system-gray5);
+            border-radius: 2px;
+            position: relative;
+            margin: 0 8px;
+        }
+
+        .audio-progress {
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: 100%;
+            background-color: var(--vk-blue);
+            border-radius: 2px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="container header-content">
+            <div class="header-action left" id="back-button" style="display: none;">Назад</div>
+            <div class="title">VK Community Manager Pro</div>
+            <div class="header-action right" id="header-action"></div>
+        </div>
+    
+    <script>
+        // Переключение между вкладками основного меню
+        document.addEventListener('DOMContentLoaded', function() {
+            // Инициализация основных вкладок
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    
+                    // Убрать активный класс у всех вкладок
+                    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                    // Добавить активный класс к выбранной вкладке
+                    this.classList.add('active');
+                    
+                    // Скрыть все разделы
+                    document.querySelectorAll('.section').forEach(section => section.classList.remove('active'));
+                    // Показать выбранный раздел
+                    const sectionId = this.getAttribute('data-section');
+                    const section = document.getElementById(sectionId);
+                    
+                    if (section) {
+                        section.classList.add('active');
+                        // Скрыть кнопку "Назад" при переходе на основные разделы
+                        document.getElementById('back-button').style.display = 'none';
+                    } else {
+                        console.error(`Раздел с ID ${sectionId} не найден`);
+                    }
+                });
+            });
+        
+            // Переключение между вкладками в карточках
+            document.querySelectorAll('.tab-header-item').forEach(tab => {
+                tab.addEventListener('click', function() {
+                    // Найти родительский контейнер с вкладками
+                    const tabsWrapper = this.closest('.tabs-wrapper');
+                    
+                    // Убрать активный класс у всех заголовков вкладок в этом контейнере
+                    tabsWrapper.querySelectorAll('.tab-header-item').forEach(t => t.classList.remove('active'));
+                    // Добавить активный класс к выбранному заголовку
+                    this.classList.add('active');
+                    
+                    // Скрыть весь контент вкладок в этом контейнере
+                    tabsWrapper.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+                    // Показать выбранный контент
+                    const tabId = this.getAttribute('data-tab');
+                    tabsWrapper.querySelector(`#${tabId}`).classList.add('active');
+                });
+            });
+            
+            // Переключение графиков в segmented control
+            document.querySelectorAll('.segment').forEach(segment => {
+                segment.addEventListener('click', function() {
+                    // Найти родительский segmented control
+                    const control = this.closest('.segmented-control');
+                    
+                    // Убрать активный класс у всех сегментов
+                    control.querySelectorAll('.segment').forEach(s => s.classList.remove('active'));
+                    // Добавить активный класс к выбранному сегменту
+                    this.classList.add('active');
+                    
+                    // Логика переключения графиков будет реализована при инициализации Chart.js
+                });
+            });
+            
+            // Открытие модального окна создания публикации
+            document.getElementById('new-post-btn').addEventListener('click', function() {
+                openModal('new-post-modal');
+            });
+            
+            document.getElementById('new-scheduled-post-btn')?.addEventListener('click', function() {
+                openModal('new-post-modal');
+                // Показать поле для выбора времени публикации
+                document.querySelector('#new-post-modal select.form-input').value = 'Запланировать';
+                document.getElementById('scheduled-time-group').classList.remove('hidden');
+            });
+            
+            document.getElementById('new-draft-btn')?.addEventListener('click', function() {
+                openModal('new-post-modal');
+                // Изменить текст кнопки публикации
+                document.getElementById('post-publish-btn').textContent = 'Сохранить';
+            });
+            
+            // Показ меню действий для публикации
+            document.querySelectorAll('.post-menu-trigger').forEach(trigger => {
+                trigger.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    
+                    const postMenu = document.getElementById('post-menu');
+                    const rect = this.getBoundingClientRect();
+                    
+                    postMenu.style.top = rect.bottom + 'px';
+                    postMenu.style.right = (window.innerWidth - rect.right) + 'px';
+                    postMenu.classList.add('active');
+                    
+                    // Сохраняем ID поста для дальнейших действий
+                    const postId = this.getAttribute('data-post-id');
+                    postMenu.setAttribute('data-current-post', postId);
+                });
+            });
+            
+            // Открытие action sheet для выбора типа автоматизации
+            document.getElementById('add-automation-btn')?.addEventListener('click', function() {
+                document.getElementById('automation-action-sheet').classList.add('active');
+            });
+            
+            // Закрытие action sheet
+            document.querySelectorAll('#automation-action-sheet .action-sheet-item, #automation-cancel').forEach(item => {
+                item.addEventListener('click', function() {
+                    document.getElementById('automation-action-sheet').classList.remove('active');
+                });
+            });
+            
+            // Функция открытия модального окна
+            function openModal(modalId) {
+                const modal = document.getElementById(modalId);
+                if (!modal) return;
+                
+                modal.style.display = 'flex';
+                setTimeout(() => {
+                    modal.classList.add('active');
+                }, 10);
+            }
+            
+            // Функция закрытия модального окна
+            function closeModal(modalId) {
+                const modal = document.getElementById(modalId);
+                if (!modal) return;
+                
+                modal.classList.remove('active');
+                setTimeout(() => {
+                    modal.style.display = 'none';
+                }, 300);
+            }
+            
+            // Закрытие модальных окон по кнопкам "Отмена"
+            document.querySelectorAll('.modal-header-left').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const modal = this.closest('.modal');
+                    closeModal(modal.id);
+                });
+            });
+            
+            // Переключение выбора времени публикации
+            document.querySelector('#new-post-modal select.form-input')?.addEventListener('change', function() {
+                if (this.value === 'Запланировать') {
+                    document.getElementById('scheduled-time-group').classList.remove('hidden');
+                } else {
+                    document.getElementById('scheduled-time-group').classList.add('hidden');
+                }
+            });
+            
+            // Показ/скрытие блока создания опроса
+            document.getElementById('attach-poll-toggle')?.addEventListener('change', function() {
+                if (this.checked) {
+                    document.getElementById('poll-creation').classList.remove('hidden');
+                } else {
+                    document.getElementById('poll-creation').classList.add('hidden');
+                }
+            });
+            
+            // Закрытие меню при клике в любом месте страницы
+            document.addEventListener('click', function() {
+                document.getElementById('post-menu').classList.remove('active');
+            });
+            
+            // Предотвращение закрытия меню при клике на само меню
+            document.getElementById('post-menu')?.addEventListener('click', function(e) {
+                e.stopPropagation();
+            });
+            
+            // Обработка действий с публикацией из меню
+            document.querySelectorAll('#post-menu .menu-item').forEach(item => {
+                item.addEventListener('click', function() {
+                    const postMenu = document.getElementById('post-menu');
+                    const postId = postMenu.getAttribute('data-current-post');
+                    
+                    if (this.id === 'edit-post-menu-item') {
+                        // Действие редактирования поста
+                        openModal('new-post-modal');
+                        document.querySelector('#new-post-modal .modal-title').textContent = 'Редактирование публикации';
+                        document.getElementById('post-publish-btn').textContent = 'Сохранить';
+                    } else if (this.id === 'delete-post-menu-item') {
+                        // Действие удаления поста (в реальном приложении потребовалось бы подтверждение)
+                        showLoader();
+                        setTimeout(() => {
+                            hideLoader();
+                            // Здесь был бы код удаления поста
+                        }, 1000);
+                    }
+                    
+                    postMenu.classList.remove('active');
+                });
+            });
+            
+            // Переход к чату с пользователем
+            document.querySelectorAll('.messages-user').forEach(user => {
+                user.addEventListener('click', function() {
+                    // Показать раздел чата и скрыть список сообщений
+                    document.getElementById('messages-section').classList.remove('active');
+                    document.getElementById('chat-section').classList.add('active');
+                    
+                    // Показать кнопку "Назад"
+                    document.getElementById('back-button').style.display = 'block';
+                    
+                    // Установить имя пользователя в заголовок чата
+                    const userName = this.querySelector('.user-name').textContent.split(' <')[0];
+                    document.querySelector('.conversation-name').textContent = userName;
+                });
+            });
+            
+            // Возврат из чата к списку сообщений
+            document.getElementById('back-to-messages')?.addEventListener('click', function() {
+                document.getElementById('chat-section').classList.remove('active');
+                document.getElementById('messages-section').classList.add('active');
+                document.getElementById('back-button').style.display = 'none';
+            });
+            
+            // Функция показа индикатора загрузки
+            function showLoader() {
+                const loader = document.getElementById('loading-indicator');
+                if (loader) loader.classList.add('active');
+            }
+            
+            // Функция скрытия индикатора загрузки
+            function hideLoader() {
+                const loader = document.getElementById('loading-indicator');
+                if (loader) loader.classList.remove('active');
+            }
+            
+            // Обработка кнопки "Назад"
+            document.getElementById('back-button').addEventListener('click', function() {
+                // Скрыть текущий раздел и вернуться к предыдущему
+                if (document.getElementById('chat-section').classList.contains('active')) {
+                    document.getElementById('chat-section').classList.remove('active');
+                    document.getElementById('messages-section').classList.add('active');
+                }
+                
+                // Скрыть кнопку "Назад"
+                this.style.display = 'none';
+            });
+            
+            // Переход к разделам через ссылки в заголовках
+            document.querySelectorAll('.more-link').forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    
+                    // Убрать активный класс у всех разделов
+                    document.querySelectorAll('.section').forEach(section => section.classList.remove('active'));
+                    
+                    // Показать выбранный раздел
+                    const sectionId = this.getAttribute('data-section');
+                    document.getElementById(sectionId).classList.add('active');
+                    
+                    // Обновить активную вкладку в нижнем меню
+                    document.querySelectorAll('.tab').forEach(tab => {
+                        if (tab.getAttribute('data-section') === sectionId) {
+                            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                            tab.classList.add('active');
+                        }
+                    });
+                });
+            });
+            
+            // Генерация тепловой карты активности
+            function generateActivityHeatmap() {
+                const heatmapContainer = document.querySelector('.activity-heatmap');
+                if (!heatmapContainer) return;
+                
+                heatmapContainer.innerHTML = '';
+                
+                // Создаем сетку 7x24 (7 дней недели x 24 часа)
+                for (let hour = 0; hour < 24; hour++) {
+                    const row = document.createElement('div');
+                    row.className = 'heatmap-row';
+                    
+                    for (let day = 0; day < 7; day++) {
+                        const cell = document.createElement('div');
+                        cell.className = 'heatmap-cell';
+                        
+                        // Генерация псевдослучайных данных об активности
+                        const activity = getActivityLevel(day, hour);
+                        if (activity > 0) {
+                            cell.classList.add(`level-${activity}`);
+                        }
+                        
+                        row.appendChild(cell);
+                    }
+                    
+                    heatmapContainer.appendChild(row);
+                }
+            }
+            
+            // Получение уровня активности для дня недели и часа (имитация данных)
+            function getActivityLevel(day, hour) {
+                // Рабочие дни, рабочие часы - больше активности
+                if (day < 5 && hour >= 9 && hour <= 18) {
+                    return Math.floor(Math.random() * 3) + 2; // Уровни 2-4
+                }
+                
+                // Вечера и выходные - средняя активность
+                if ((day >= 5 || hour > 18 || hour < 9) && hour > 7 && hour < 23) {
+                    return Math.floor(Math.random() * 2) + 1; // Уровни 1-2
+                }
+                
+                // Ночное время - низкая активность
+                if (hour >= 23 || hour <= 7) {
+                    const rand = Math.random();
+                    if (rand > 0.7) return 1;
+                    return 0;
+                }
+                
+                return 0;
+            }
+            
+            // Инициализация графиков
+            function initCharts() {
+                // График динамики аудитории
+                const audienceCtx = document.getElementById('audience-chart')?.getContext('2d');
+                if (audienceCtx) {
+                    const audienceChart = new Chart(audienceCtx, {
+                        type: 'line',
+                        data: {
+                            labels: Array.from({length: 30}, (_, i) => `${i+1}`),
+                            datasets: [{
+                                label: 'Подписчики',
+                                data: [14150, 14190, 14220, 14270, 14310, 14350, 14380, 14410, 14445, 14480, 14510, 14545, 14570, 14600, 14640, 14680, 14720, 14750, 14790, 14840, 14870, 14910, 14950, 14990, 15030, 15070, 15120, 15170, 15220, 15270],
+                                borderColor: '#0077FF',
+                                backgroundColor: 'rgba(0, 119, 255, 0.1)',
+                                borderWidth: 2,
+                                tension: 0.3,
+                                fill: true
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: {
+                                    display: false
+                                }
+                            },
+                            scales: {
+                                y: {
+                                    min: 14000,
+                                    ticks: {
+                                        callback: function(value) {
+                                            if (value >= 1000) {
+                                                return value / 1000 + 'K';
+                                            }
+                                            return value;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    });
+                    
+                    // Данные для графика охвата
+                    const reachData = {
+                        labels: Array.from({length: 30}, (_, i) => `${i+1}`),
+                        datasets: [{
+                            label: 'Охват',
+                            data: [1800, 1950, 2100, 2400, 2200, 1900, 2000, 2300, 2500, 2700, 2600, 2400, 2300, 2100, 2000, 1900, 1800, 2000, 2200, 2400, 2600, 2700, 2800, 2900, 3100, 3300, 3500, 3400, 3200, 3000],
+                            borderColor: '#34C759',
+                            backgroundColor: 'rgba(52, 199, 89, 0.1)',
+                            borderWidth: 2,
+                            tension: 0.3,
+                            fill: true
+                        }]
+                    };
+                    
+                    // Переключение между графиками в сегментированном контроле
+                    document.querySelectorAll('[data-chart]').forEach(segment => {
+                        segment.addEventListener('click', function() {
+                            const chartType = this.getAttribute('data-chart');
+                            
+                            if (chartType === 'followers') {
+                                audienceChart.data = {
+                                    labels: Array.from({length: 30}, (_, i) => `${i+1}`),
+                                    datasets: [{
+                                        label: 'Подписчики',
+                                        data: [14150, 14190, 14220, 14270, 14310, 14350, 14380, 14410, 14445, 14480, 14510, 14545, 14570, 14600, 14640, 14680, 14720, 14750, 14790, 14840, 14870, 14910, 14950, 14990, 15030, 15070, 15120, 15170, 15220, 15270],
+                                        borderColor: '#0077FF',
+                                        backgroundColor: 'rgba(0, 119, 255, 0.1)',
+                                        borderWidth: 2,
+                                        tension: 0.3,
+                                        fill: true
+                                    }]
+                                };
+                            } else if (chartType === 'reach') {
+                                audienceChart.data = reachData;
+                            }
+                            
+                            audienceChart.update();
+                        });
+                    });
+                }
+            }
+            
+            // Имитация VK Mini Apps Bridge (для демонстрации)
+            window.vkBridge = {
+                send: function(method, params) {
+                    console.log('VK Bridge call:', method, params);
+                    return new Promise(resolve => {
+                        // Имитация успешного ответа
+                        setTimeout(() => {
+                            if (method === 'VKWebAppGetUserInfo') {
+                                resolve({
+                                    id: 123456789,
+                                    first_name: 'Иван',
+                                    last_name: 'Иванов',
+                                    photo_100: ''
+                                });
+                            } else if (method === 'VKWebAppGetCommunityInfo') {
+                                resolve({
+                                    id: 987654321,
+                                    name: 'Моё сообщество ВКонтакте',
+                                    screen_name: 'my_community',
+                                    is_closed: 0,
+                                    type: 'group',
+                                    is_admin: 1,
+                                    admin_level: 3,
+                                    members_count: 14586
+                                });
+                            } else if (method === 'VKWebAppGetCommunityToken') {
+                                resolve({
+                                    access_token: 'sample_community_token'
+                                });
+                            } else {
+                                resolve({ result: true });
+                            }
+                        }, 300);
+                    });
+                }
+            };
+            
+            // Инициализация VK Mini Apps
+            function initVKMiniApp() {
+                // Имитация инициализации приложения
+                vkBridge.send('VKWebAppInit')
+                    .then(data => {
+                        console.log('VK Mini App initialized');
+                        
+                        // Получение данных о пользователе
+                        return vkBridge.send('VKWebAppGetUserInfo');
+                    })
+                    .then(userData => {
+                        console.log('User data received:', userData);
+                        
+                        // Получение данных о сообществе
+                        return vkBridge.send('VKWebAppGetCommunityInfo', {
+                            group_id: 987654321
+                        });
+                    })
+                    .then(communityData => {
+                        console.log('Community data received:', communityData);
+                        
+                        // Запрос токена сообщества для управления
+                        return vkBridge.send('VKWebAppGetCommunityToken', {
+                            app_id: 1234567,
+                            group_id: 987654321,
+                            scope: 'app_widget,messages,photos,docs,manage'
+                        });
+                    })
+                    .then(tokenData => {
+                        console.log('Community token received');
+                        
+                        // В реальном приложении здесь бы выполнялась загрузка данных сообщества
+                        loadCommunityData();
+                    })
+                    .catch(error => {
+                        console.error('Error initializing VK Mini App:', error);
+                    });
+            }
+            
+            // Функция для загрузки данных сообщества (имитация)
+            function loadCommunityData() {
+                showLoader();
+                
+                // Имитация запроса данных с сервера
+                setTimeout(() => {
+                    hideLoader();
+                    
+                    // Отображение загруженных данных
+                    console.log('Community data loaded successfully');
+                    
+                    // Здесь бы происходило заполнение интерфейса реальными данными
+                }, 1000);
+            }
+            
+            // Имитация интеграции с make.com и pipedream (для демонстрации)
+            function setupIntegration(service) {
+                // Эта функция генерирует webhook URL для интеграции
+                // и настраивает взаимодействие с выбранным сервисом
+                
+                const apiEndpoints = {
+                    'make': 'https://hook.make.com/webhook',
+                    'pipedream': 'https://endpoint.pipedream.net/webhook'
+                };
+                
+                const token = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+                
+                return {
+                    webhook: apiEndpoints[service] + '/' + token,
+                    sendData: function(data) {
+                        // Имитация отправки данных в сервис
+                        console.log(`Sending data to ${service}:`, data);
+                        // В реальном приложении здесь был бы fetch запрос
+                        
+                        // Имитация успешного ответа
+                        return new Promise(resolve => {
+                            setTimeout(() => {
+                                resolve({ success: true });
+                            }, 300);
+                        });
+                    }
+                };
+            }
+            
+            // Настройка обработчиков событий для интеграций
+            document.querySelectorAll('.integration-card .switch input').forEach((toggle, index) => {
+                toggle.addEventListener('change', function(e) {
+                    const integrationName = this.closest('.integration-card').querySelector('.integration-name').textContent;
+                    const isEnabled = this.checked;
+                    
+                    showLoader();
+                    
+                    // Имитация процесса включения/выключения интеграции
+                    setTimeout(() => {
+                        hideLoader();
+                        
+                        if (isEnabled) {
+                            console.log(`${integrationName} integration enabled`);
+                            
+                            // Настройка интеграции
+                            const service = integrationName.toLowerCase().split('.')[0];
+                            const integration = setupIntegration(service);
+                            
+                            // Обновление поля webhook в форме настроек
+                            const webhookInputs = document.querySelectorAll('.form-input[placeholder*="hook"]');
+                            if (webhookInputs.length > index) {
+                                webhookInputs[index].value = integration.webhook;
+                            }
+                            
+                            // Отправка тестовых данных
+                            integration.sendData({
+                                event: 'integration_enabled',
+                                timestamp: new Date().toISOString(),
+                                service: service
+                            });
+                        } else {
+                            console.log(`${integrationName} integration disabled`);
+                        }
+                    }, 800);
+                });
+            });
+            
+            // Имитация загрузки при запуске приложения
+            showLoader();
+            
+            setTimeout(() => {
+                hideLoader();
+                
+                // Инициализация графиков
+                initCharts();
+                
+                // Генерация сетки активности
+                generateActivityHeatmap();
+                
+                // Инициализация приложения
+                initVKMiniApp();
+            }, 1000);
+        });
+    </script>
+    
+    <div class="tab-bar">
+        <a href="#" class="tab active" data-section="dashboard-section">
+            <div class="tab-icon">📊</div>
+            <div class="tab-label">Аналитика</div>
+        </a>
+        <a href="#" class="tab" data-section="content-section">
+            <div class="tab-icon">📝</div>
+            <div class="tab-label">Контент</div>
+        </a>
+        <a href="#" class="tab" data-section="messages-section">
+            <div class="tab-icon">💬</div>
+            <div class="tab-label">Сообщения</div>
+        </a>
+        <a href="#" class="tab" data-section="integrations-section">
+            <div class="tab-icon">🔄</div>
+            <div class="tab-label">Интеграции</div>
+        </a>
+        <a href="#" class="tab" data-section="settings-section">
+            <div class="tab-icon">⚙️</div>
+            <div class="tab-label">Настройки</div>
+        </a>
+    </div>
+        
+        <!-- Индикатор загрузки -->
+        <div class="loading" id="loading-indicator">
+            <div class="spinner"></div>
+        </div>
+        
+        <!-- Модальные окна -->
+        
+        <!-- Модальное окно создания публикации -->
+        <div class="modal" id="new-post-modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <div class="modal-header-left">Отмена</div>
+                    <div class="modal-title">Новая публикация</div>
+                    <div class="modal-header-right" id="post-publish-btn">Опубликовать</div>
+                </div>
+                <div class="modal-scroll">
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <textarea class="form-input" rows="6" placeholder="Что у вас нового?"></textarea>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Медиа</label>
+                            <div class="media-grid" style="grid-template-columns: repeat(4, 1fr);">
+                                <div class="media-item" style="background-image: url(/api/placeholder/100/100);">
+                                    <div class="media-type">📷</div>
+                                </div>
+                                <div class="media-item" style="background-color: var(--system-gray6); display: flex; align-items: center; justify-content: center;">
+                                    <div style="font-size: 24px; color: var(--system-gray);">+</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Добавить вложения</label>
+                            <div class="tags">
+                                <div class="tag">Фото <span class="tag-remove">×</span></div>
+                            </div>
+                            <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+                                <button class="button secondary small" id="add-photo-btn">Фото</button>
+                                <button class="button secondary small" id="add-video-btn">Видео</button>
+                                <button class="button secondary small" id="add-gif-btn">GIF</button>
+                                <button class="button secondary small" id="add-audio-btn">Аудио</button>
+                                <button class="button secondary small" id="add-file-btn">Файл</button>
+                                <button class="button secondary small" id="add-poll-btn">Опрос</button>
+                                <button class="button secondary small" id="add-map-btn">Карта</button>
+                                <button class="button secondary small" id="add-article-btn">Статья</button>
+                                <button class="button secondary small" id="add-product-link-btn">Товар</button>
+                            </div>
+                        </div>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label">Время публикации</label>
+                                <select class="form-input">
+                                    <option>Сейчас</option>
+                                    <option>Запланировать</option>
+                                </select>
+                            </div>
+                            <div class="form-group hidden" id="scheduled-time-group">
+                                <label class="form-label">Дата и время</label>
+                                <input type="datetime-local" class="form-input">
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Настройки</label>
+                            
+                            <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid var(--system-gray6);">
+                                <div style="font-size: 15px; font-weight: 500;">Комментарии</div>
+                                <label class="switch">
+                                    <input type="checkbox" checked>
+                                    <span class="slider"></span>
+                                </label>
+                            </div>
+                            
+                            <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid var(--system-gray6);">
+                                <div style="font-size: 15px; font-weight: 500;">Прикрепить опрос</div>
+                                <label class="switch">
+                                    <input type="checkbox" id="attach-poll-toggle">
+                                    <span class="slider"></span>
+                                </label>
+                            </div>
+                            
+                            <div id="poll-creation" class="hidden" style="padding: 12px; margin: 12px 0; background-color: var(--system-gray6); border-radius: 10px;">
+                                <div class="form-group">
+                                    <label class="form-label">Вопрос</label>
+                                    <input type="text" class="form-input" placeholder="Введите вопрос опроса">
+                                </div>
+                                <div id="poll-options">
+                                    <div class="form-group">
+                                        <label class="form-label">Вариант 1</label>
+                                        <input type="text" class="form-input" placeholder="Введите вариант ответа">
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">Вариант 2</label>
+                                        <input type="text" class="form-input" placeholder="Введите вариант ответа">
+                                    </div>
+                                </div>
+                                <button class="button secondary" style="width: 100%;">Добавить вариант</button>
+                                
+                                <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 12px;">
+                                    <div style="font-size: 15px; font-weight: 500;">Анонимный опрос</div>
+                                    <label class="switch">
+                                        <input type="checkbox">
+                                        <span class="slider"></span>
+                                    </label>
+                                </div>
+                                
+                                <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 12px;">
+                                    <div style="font-size: 15px; font-weight: 500;">Несколько вариантов</div>
+                                    <label class="switch">
+                                        <input type="checkbox">
+                                        <span class="slider"></span>
+                                    </label>
+                                </div>
+                            </div>
+                            
+                            <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px 0;">
+                                <div style="font-size: 15px; font-weight: 500;">Закрепить запись</div>
+                                <label class="switch">
+                                    <input type="checkbox">
+                                    <span class="slider"></span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Меню действий с публикацией -->
+        <div class="menu" id="post-menu">
+            <div class="menu-item" id="edit-post-menu-item">
+                <i>✏️</i> Редактировать
+            </div>
+            <div class="menu-item" id="pin-post-menu-item">
+                <i>📌</i> Закрепить
+            </div>
+            <div class="menu-item" id="stat-post-menu-item">
+                <i>📊</i> Статистика
+            </div>
+            <div class="menu-divider"></div>
+            <div class="menu-item" id="boost-post-menu-item">
+                <i>🚀</i> Продвинуть
+            </div>
+            <div class="menu-divider"></div>
+            <div class="menu-item destructive" id="delete-post-menu-item">
+                <i>🗑️</i> Удалить
+            </div>
+        </div>
+        
+        <!-- Action sheet выбора типа автоматизации -->
+        <div class="action-sheet" id="automation-action-sheet">
+            <div class="action-sheet-content">
+                <div class="action-sheet-item" id="automation-schedule">Публикация по расписанию</div>
+                <div class="action-sheet-item" id="automation-welcome">Приветствие новых подписчиков</div>
+                <div class="action-sheet-item" id="automation-report">Аналитический отчет</div>
+                <div class="action-sheet-item" id="automation-moderation">Модерация комментариев</div>
+                <div class="action-sheet-item" id="automation-notification">Уведомления о событиях</div>
+                <div class="action-sheet-cancel" id="automation-cancel">Отмена</div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="container">
+        <!-- Главная / Аналитика -->
+        <div id="dashboard-section" class="section active">
+            <div class="section-title">Обзор сообщества</div>
+            <div class="section-subtitle">Данные за последние 30 дней</div>
+            
+            <div class="stat-grid">
+                <div class="stat-card">
+                    <div class="stat-value">14,586</div>
+                    <div class="stat-change positive">+436 (+3.1%)</div>
+                    <div class="stat-label">Подписчиков</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">52,974</div>
+                    <div class="stat-change positive">+14,253 (+36.8%)</div>
+                    <div class="stat-label">Охват постов</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">6.2%</div>
+                    <div class="stat-change positive">+0.4%</div>
+                    <div class="stat-label">Вовлеченность</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">842</div>
+                    <div class="stat-change negative">-102 (-10.8%)</div>
+                    <div class="stat-label">Сообщений</div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-header">
+                    <div>
+                        <div class="card-title">Динамика аудитории</div>
+                        <div class="card-subtitle">Последние 30 дней</div>
+                    </div>
+                    <div class="segmented-control" style="width: 200px;">
+                        <div class="segment active" data-chart="followers">Подписчики</div>
+                        <div class="segment" data-chart="reach">Охват</div>
+                    </div>
+                </div>
+                <div class="card-content">
+                    <div class="chart-container">
+                        <canvas id="audience-chart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section-title">
+                Лучший контент
+                <a href="#" class="more-link" data-section="content-section">Все публикации</a>
+            </div>
+            
+            <div class="card">
+                <div class="tabs-wrapper">
+                    <div class="tabs-header">
+                        <div class="tab-header-item active" data-tab="best-liked">По лайкам</div>
+                        <div class="tab-header-item" data-tab="best-commented">По комментариям</div>
+                        <div class="tab-header-item" data-tab="best-reach">По охвату</div>
+                    </div>
+                    
+                    <div class="tab-content active" id="best-liked">
+                        <div class="post">
+                            <div class="post-image" style="background-image: url(/api/placeholder/60/60);"></div>
+                            <div class="post-content">
+                                <div class="post-top">
+                                    <div class="post-date">22 февраля в 14:30</div>
+                                    <div class="post-actions">
+                                        <div class="post-action">⋮</div>
+                                    </div>
+                                </div>
+                                <div class="post-text">Мы запустили новую линейку продуктов, которая уже доступна в нашем магазине! Успейте приобрести по специальной цене.</div>
+                                <div class="post-stats">
+                                    <div class="post-stat">
+                                        <span class="post-stat-icon">👍</span> 328
+                                    </div>
+                                    <div class="post-stat">
+                                        <span class="post-stat-icon">💬</span> 47
+                                    </div>
+                                    <div class="post-stat">
+                                        <span class="post-stat-icon">👁️</span> 4.8K
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="post">
+                            <div class="post-image" style="background-image: url(/api/placeholder/60/60);"></div>
+                            <div class="post-content">
+                                <div class="post-top">
+                                    <div class="post-date">5 марта в 10:15</div>
+                                    <div class="post-actions">
+                                        <div class="post-action">⋮</div>
+                                    </div>
+                                </div>
+                                <div class="post-text">Результаты нашего конкурса уже доступны! Поздравляем победителей и благодарим всех за участие.</div>
+                                <div class="post-stats">
+                                    <div class="post-stat">
+                                        <span class="post-stat-icon">👍</span> 286
+                                    </div>
+                                    <div class="post-stat">
+                                        <span class="post-stat-icon">💬</span> 52
+                                    </div>
+                                    <div class="post-stat">
+                                        <span class="post-stat-icon">👁️</span> 3.4K
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="tab-content" id="best-commented">
+                        <div class="post">
+                            <div class="post-image" style="background-image: url(/api/placeholder/60/60);"></div>
+                            <div class="post-content">
+                                <div class="post-top">
+                                    <div class="post-date">28 февраля в 15:45</div>
+                                    <div class="post-actions">
+                                        <div class="post-action">⋮</div>
+                                    </div>
+                                </div>
+                                <div class="post-text">Конкурс! Разыгрываем 5 подарочных наборов среди наших подписчиков. Для участия: 1) Поставьте лайк 2) Оставьте комментарий</div>
+                                <div class="post-stats">
+                                    <div class="post-stat">
+                                        <span class="post-stat-icon">👍</span> 243
+                                    </div>
+                                    <div class="post-stat">
+                                        <span class="post-stat-icon">💬</span> 187
+                                    </div>
+                                    <div class="post-stat">
+                                        <span class="post-stat-icon">👁️</span> 5.2K
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="tab-content" id="best-reach">
+                        <div class="post">
+                            <div class="post-image" style="background-image: url(/api/placeholder/60/60);"></div>
+                            <div class="post-content">
+                                <div class="post-top">
+                                    <div class="post-date">15 марта в 12:00</div>
+                                    <div class="post-actions">
+                                        <div class="post-action">⋮</div>
+                                    </div>
+                                </div>
+                                <div class="post-text">Грандиозная распродажа! Скидки до 70% на весь ассортимент только до конца недели. Успейте приобрести товары по самым выгодным ценам.</div>
+                                <div class="post-stats">
+                                    <div class="post-stat">
+                                        <span class="post-stat-icon">👍</span> 174
+                                    </div>
+                                    <div class="post-stat">
+                                        <span class="post-stat-icon">💬</span> 32
+                                    </div>
+                                    <div class="post-stat">
+                                        <span class="post-stat-icon">👁️</span> 8.7K
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section-title">Активность сообщества</div>
+            
+            <div class="card">
+                <div class="card-header">
+                    <div>
+                        <div class="card-title">Активность по дням и времени</div>
+                        <div class="card-subtitle">Когда ваша аудитория наиболее активна</div>
+                    </div>
+                </div>
+                <div class="card-content">
+                    <div class="heatmap-days">
+                        <div class="heatmap-day">Пн</div>
+                        <div class="heatmap-day">Вт</div>
+                        <div class="heatmap-day">Ср</div>
+                        <div class="heatmap-day">Чт</div>
+                        <div class="heatmap-day">Пт</div>
+                        <div class="heatmap-day">Сб</div>
+                        <div class="heatmap-day">Вс</div>
+                    </div>
+                    <div class="activity-heatmap">
+                        <!-- Генерируется скриптом -->
+                    </div>
+                    <div style="margin-top: 12px; display: flex; justify-content: space-between;">
+                        <div class="heatmap-time">00:00</div>
+                        <div class="heatmap-time">06:00</div>
+                        <div class="heatmap-time">12:00</div>
+                        <div class="heatmap-time">18:00</div>
+                        <div class="heatmap-time">23:59</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section-title">
+                Демография подписчиков
+                <a href="#" class="more-link" data-section="dashboard-demographics">Подробнее</a>
+            </div>
+            
+            <div class="stat-grid cols-3">
+                <div class="stat-card">
+                    <div class="stat-value">67%</div>
+                    <div class="stat-label">Женщины</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">33%</div>
+                    <div class="stat-label">Мужчины</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">24-35</div>
+                    <div class="stat-label">Основной возраст</div>
+                </div>
+            </div>
+            
+            <div class="section-title">
+                Непрочитанные сообщения
+                <a href="#" class="more-link" data-section="messages-section">Все сообщения</a>
+            </div>
+            
+            <div class="card">
+                <div class="card-content">
+                    <div class="post" style="align-items: center;">
+                        <div class="avatar" style="background-image: url(/api/placeholder/40/40);"></div>
+                        <div class="post-content">
+                            <div class="post-top">
+                                <div class="user-name">Анна Иванова</div>
+                                <div class="post-date">Сегодня, 12:45</div>
+                            </div>
+                            <div class="post-text">Добрый день! Подскажите, пожалуйста, когда ожидается поступление новой коллекции?</div>
+                        </div>
+                    </div>
+                    
+                    <div class="post" style="align-items: center;">
+                        <div class="avatar" style="background-image: url(/api/placeholder/40/40);"></div>
+                        <div class="post-content">
+                            <div class="post-top">
+                                <div class="user-name">Максим Петров</div>
+                                <div class="post-date">Вчера, 19:18</div>
+                            </div>
+                            <div class="post-text">Здравствуйте! Я оформил заказ №1458, но до сих пор не получил информацию о доставке.</div>
+                        </div>
+                    </div>
+                    
+                    <button class="button" style="width: 100%; margin-top: 8px;">Ответить на сообщения</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Сообщения -->
+        <div id="messages-section" class="section">
+            <div class="section-title">Сообщения сообщества</div>
+            
+            <div class="search-container">
+                <div class="search-icon">🔍</div>
+                <input type="text" class="search-input" placeholder="Поиск по сообщениям...">
+            </div>
+            
+            <div class="tabs-wrapper">
+                <div class="tabs-header">
+                    <div class="tab-header-item active" data-tab="all-messages">Все <span class="badge">28</span></div>
+                    <div class="tab-header-item" data-tab="unread-messages">Непрочитанные <span class="badge primary">8</span></div>
+                    <div class="tab-header-item" data-tab="important-messages">Важные <span class="badge">3</span></div>
+                </div>
+                
+                <div class="tab-content active" id="all-messages">
+                    <div class="user-item messages-user" data-user-id="1">
+                        <div class="avatar" style="background-image: url(/api/placeholder/40/40);"></div>
+                        <div class="user-info">
+                            <div class="user-name">Анна Иванова <span class="badge primary">Новое</span></div>
+                            <div class="user-status">Добрый день! Подскажите, пожалуйста, когда...</div>
+                        </div>
+                        <div style="font-size: 12px; color: var(--system-gray);">12:45</div>
+                    </div>
+                    
+                    <div class="user-item messages-user" data-user-id="2">
+                        <div class="avatar" style="background-image: url(/api/placeholder/40/40);"></div>
+                        <div class="user-info">
+                            <div class="user-name">Максим Петров <span class="badge primary">Новое</span></div>
+                            <div class="user-status">Здравствуйте! Я оформил заказ №1458, но...</div>
+                        </div>
+                        <div style="font-size: 12px; color: var(--system-gray);">Вчера</div>
+                    </div>
+                    
+                    <div class="user-item messages-user" data-user-id="3">
+                        <div class="avatar" style="background-image: url(/api/placeholder/40/40);"></div>
+                        <div class="user-info">
+                            <div class="user-name">Ольга Сидорова</div>
+                            <div class="user-status">Спасибо за оперативный ответ! Буду ждать...</div>
+                        </div>
+                        <div style="font-size: 12px; color: var(--system-gray);">Вчера</div>
+                    </div>
+                    
+                    <div class="user-item messages-user" data-user-id="4">
+                        <div class="avatar" style="background-image: url(/api/placeholder/40/40);"></div>
+                        <div class="user-info">
+                            <div class="user-name">Дмитрий Кузнецов</div>
+                            <div class="user-status">Получил заказ, все отлично! Спасибо за...</div>
+                        </div>
+                        <div style="font-size: 12px; color: var(--system-gray);">14 марта</div>
+                    </div>
+                </div>
+                
+                <!-- Другие вкладки сообщений имеют аналогичную структуру -->
+            </div>
+        </div>
+        
+        <!-- Окно чата с пользователем -->
+        <div id="chat-section" class="section">
+            <div class="conversation-header">
+                <div class="avatar" style="background-image: url(/api/placeholder/40/40);"></div>
+                <div class="conversation-info">
+                    <div class="conversation-name">Анна Иванова</div>
+                    <div class="conversation-status">Онлайн</div>
+                </div>
+                <button class="button secondary small" id="back-to-messages">Назад</button>
+            </div>
+            
+            <div class="message-list">
+                <div class="message incoming">
+                    <div>Добрый день! Подскажите, пожалуйста, когда ожидается поступление новой коллекции?</div>
+                    <div class="message-time">12:45</div>
+                </div>
+                
+                <div class="message outgoing">
+                    <div>Здравствуйте, Анна! Новая коллекция поступит в продажу уже на следующей неделе. Вы можете оформить предзаказ на нашем сайте.</div>
+                    <div class="message-time">12:50</div>
+                </div>
+                
+                <div class="message incoming">
+                    <div>Спасибо за информацию! А будет ли действовать скидка на предзаказы?</div>
+                    <div class="message-time">12:51</div>
+                </div>
+            </div>
+            
+            <div class="message-input-container">
+                <input type="text" class="message-input" placeholder="Введите сообщение...">
+                <div class="message-send">➤</div>
+            </div>
+            
+            <div class="card" style="margin-top: 16px;">
+                <div class="card-header">
+                    <div class="card-title">Быстрые ответы</div>
+                </div>
+                <div class="card-content">
+                    <button class="button secondary" style="margin-bottom: 8px; width: 100%; text-align: left;">Спасибо за обращение! Мы ответим в ближайшее время.</button>
+                    <button class="button secondary" style="margin-bottom: 8px; width: 100%; text-align: left;">Для оформления заказа перейдите по ссылке в нашем профиле.</button>
+                    <button class="button secondary" style="width: 100%; text-align: left;">Информация о доставке будет отправлена на указанный email.</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Публикации и контент -->
+        <div id="content-section" class="section">
+            <div class="section-title">Управление контентом</div>
+            
+            <div class="search-container">
+                <div class="search-icon">🔍</div>
+                <input type="text" class="search-input" placeholder="Поиск по публикациям...">
+            </div>
+            
+            <div class="tabs-wrapper">
+                <div class="tabs-header">
+                    <div class="tab-header-item active" data-tab="all-posts">Все</div>
+                    <div class="tab-header-item" data-tab="scheduled-posts">Запланированные</div>
+                    <div class="tab-header-item" data-tab="published-posts">Опубликованные</div>
+                    <div class="tab-header-item" data-tab="draft-posts">Черновики</div>
+                </div>
+                
+                <div class="tab-content active" id="all-posts">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                        <div class="segmented-control" style="width: 340px; margin-bottom: 0;">
+                            <div class="segment active" data-content-type="post">Записи</div>
+                            <div class="segment" data-content-type="article">Статьи</div>
+                            <div class="segment" data-content-type="story">Истории</div>
+                        </div>
+                        <button class="button" id="new-post-btn">Создать публикацию</button>
+                    </div>
+
+                    <div class="post">
+                        <div class="post-image" style="background-image: url(/api/placeholder/60/60);"></div>
+                        <div class="post-content">
+                            <div class="post-top">
+                                <div class="post-date">15 марта в 12:00</div>
+                                <div class="post-actions">
+                                    <div class="post-action post-menu-trigger" data-post-id="1">⋮</div>
+                                </div>
+                            </div>
+                            <div class="post-text">Грандиозная распродажа! Скидки до 70% на весь ассортимент только до конца недели. Успейте приобрести товары по самым выгодным ценам.</div>
+                            <div class="post-stats">
+                                <div class="post-stat">
+                                    <span class="post-stat-icon">👍</span> 174
+                                </div>
+                                <div class="post-stat">
+                                    <span class="post-stat-icon">💬</span> 32
+                                </div>
+                                <div class="post-stat">
+                                    <span class="post-stat-icon">👁️</span> 8.7K
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="post">
+                        <div class="post-image" style="background-image: url(/api/placeholder/60/60);"></div>
+                        <div class="post-content">
+                            <div class="post-top">
+                                <div class="post-date">10 марта в 17:30</div>
+                                <div class="post-actions">
+                                    <div class="post-action post-menu-trigger" data-post-id="2">⋮</div>
+                                </div>
+                            </div>
+                            <div class="post-text">Интервью с нашим экспертом: 10 советов по уходу за собой весной. Читайте полную версию на нашем сайте!</div>
+                            <div class="post-stats">
+                                <div class="post-stat">
+                                    <span class="post-stat-icon">👍</span> 132
+                                </div>
+                                <div class="post-stat">
+                                    <span class="post-stat-icon">💬</span> 15
+                                </div>
+                                <div class="post-stat">
+                                    <span class="post-stat-icon">👁️</span> 3.2K
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="post">
+                        <div class="post-image" style="background-image: url(/api/placeholder/60/60);"></div>
+                        <div class="post-content">
+                            <div class="post-top">
+                                <div class="post-date">5 марта в 10:15</div>
+                                <div class="post-actions">
+                                    <div class="post-action post-menu-trigger" data-post-id="3">⋮</div>
+                                </div>
+                            </div>
+                            <div class="post-text">Результаты нашего конкурса уже доступны! Поздравляем победителей и благодарим всех за участие.</div>
+                            <div class="post-stats">
+                                <div class="post-stat">
+                                    <span class="post-stat-icon">👍</span> 286
+                                </div>
+                                <div class="post-stat">
+                                    <span class="post-stat-icon">💬</span> 52
+                                </div>
+                                <div class="post-stat">
+                                    <span class="post-stat-icon">👁️</span> 3.4K
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="tab-content" id="scheduled-posts">
+                    <div style="display: flex; justify-content: flex-end; margin-bottom: 16px;">
+                        <button class="button" id="new-scheduled-post-btn">Запланировать</button>
+                    </div>
+                    
+                    <div class="post">
+                        <div class="post-image" style="background-image: url(/api/placeholder/60/60);"></div>
+                        <div class="post-content">
+                            <div class="post-top">
+                                <div class="post-date">Запланировано на 20 марта в 15:00</div>
+                                <div class="post-actions">
+                                    <div class="post-action post-menu-trigger" data-post-id="4">⋮</div>
+                                </div>
+                            </div>
+                            <div class="post-text">Не пропустите наш вебинар "Тренды весеннего сезона 2025". Регистрация уже открыта по ссылке в профиле.</div>
+                            <div class="post-stats">
+                                <div class="post-stat">
+                                    <span class="post-stat-icon">⏱️</span> Запланировано
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="post">
+                        <div class="post-image" style="background-image: url(/api/placeholder/60/60);"></div>
+                        <div class="post-content">
+                            <div class="post-top">
+                                <div class="post-date">Запланировано на 18 марта в 12:30</div>
+                                <div class="post-actions">
+                                    <div class="post-action post-menu-trigger" data-post-id="5">⋮</div>
+                                </div>
+                            </div>
+                            <div class="post-text">Специальное предложение для наших подписчиков: используйте промокод VK2025 и получите дополнительную скидку 15%!</div>
+                            <div class="post-stats">
+                                <div class="post-stat">
+                                    <span class="post-stat-icon">⏱️</span> Запланировано
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="tab-content" id="published-posts">
+                    <!-- Контент аналогичен вкладке "Все" -->
+                </div>
+                
+                <div class="tab-content" id="draft-posts">
+                    <div style="display: flex; justify-content: flex-end; margin-bottom: 16px;">
+                        <button class="button" id="new-draft-btn">Создать черновик</button>
+                    </div>
+                    
+                    <div class="post">
+                        <div class="post-image" style="background-image: url(/api/placeholder/60/60);"></div>
+                        <div class="post-content">
+                            <div class="post-top">
+                                <div class="post-date">Черновик от 16 марта</div>
+                                <div class="post-actions">
+                                    <div class="post-action post-menu-trigger" data-post-id="6">⋮</div>
+                                </div>
+                            </div>
+                            <div class="post-text">Мы готовим для вас что-то особенное! Следите за обновлениями в нашем сообществе.</div>
+                            <div class="post-stats">
+                                <div class="post-stat">
+                                    <span class="post-stat-icon">📄</span> Черновик
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="section-title">Медиагалерея</div>
+            
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">Медиафайлы</div>
+                    <button class="button secondary" id="upload-media-btn">Загрузить</button>
+                </div>
+                <div class="card-content">
+                    <div class="tabs-header" style="margin-top: -8px;">
+                        <div class="tab-header-item active" data-tab="media-all">Все</div>
+                        <div class="tab-header-item" data-tab="media-photos">Фото</div>
+                        <div class="tab-header-item" data-tab="media-albums">Фотоальбомы</div>
+                        <div class="tab-header-item" data-tab="media-videos">Видео</div>
+                        <div class="tab-header-item" data-tab="media-gifs">GIF</div>
+                        <div class="tab-header-item" data-tab="media-audio">Аудио</div>
+                        <div class="tab-header-item" data-tab="media-docs">Документы</div>
+                    </div>
+                    
+                    <div class="media-grid">
+                        <div class="media-item" style="background-image: url(/api/placeholder/100/100);">
+                            <div class="media-type">📷</div>
+                            <div class="media-select"></div>
+                        </div>
+                        <div class="media-item" style="background-image: url(/api/placeholder/100/100);">
+                            <div class="media-type">📷</div>
+                            <div class="media-select"></div>
+                        </div>
+                        <div class="media-item" style="background-image: url(/api/placeholder/100/100);">
+                            <div class="media-type">🎬</div>
+                            <div class="media-select"></div>
+                        </div>
+                        <div class="media-item" style="background-image: url(/api/placeholder/100/100);">
+                            <div class="media-type">📷</div>
+                            <div class="media-select"></div>
+                        </div>
+                        <div class="media-item" style="background-image: url(/api/placeholder/100/100);">
+                            <div class="media-type">📄</div>
+                            <div class="media-select"></div>
+                        </div>
+                        <div class="media-item" style="background-image: url(/api/placeholder/100/100);">
+                            <div class="media-type">📷</div>
+                            <div class="media-select"></div>
+                        </div>
+                        <div class="media-item" style="background-image: url(/api/placeholder/100/100);">
+                            <div class="media-type">🎬</div>
+                            <div class="media-select"></div>
+                        </div>
+                        <div class="media-item" style="background-image: url(/api/placeholder/100/100);">
+                            <div class="media-type">📷</div>
+                            <div class="media-select"></div>
+                        </div>
+                        <div class="media-item" style="background-image: url(/api/placeholder/100/100);">
+                            <div class="media-type">📷</div>
+                            <div class="media-select"></div>
+                        </div>
+                    </div>
+                    
+                    <div style="display: flex; gap: 10px; margin-top: 16px;">
+                        <button class="button secondary" style="flex: 1;">Выбрать все</button>
+                        <button class="button secondary" style="flex: 1;">Удалить выбранные</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section-title">Комментарии</div>
+            
+            <div class="card">
+                <div class="card-header">
+                    <div>
+                        <div class="card-title">Последние комментарии</div>
+                        <div class="card-subtitle">Управление и модерация</div>
+                    </div>
+                    <div class="segmented-control" style="width: 200px;">
+                        <div class="segment active" data-comments="all">Все</div>
+                        <div class="segment" data-comments="unread">Новые <span class="badge primary">8</span></div>
+                    </div>
+                </div>
+                <div class="card-content">
+                    <div class="comment">
+                        <div class="avatar small" style="background-image: url(/api/placeholder/32/32);"></div>
+                        <div class="comment-content">
+                            <div class="comment-header">
+                                <div class="comment-author">Сергей Смирнов</div>
+                                <div class="comment-date">Сегодня, 14:23</div>
+                            </div>
+                            <div class="comment-text">Отличное предложение! Уже сделал заказ, жду доставку 👍</div>
+                            <div class="comment-actions">
+                                <div class="comment-action">Ответить</div>
+                                <div class="comment-action">Скрыть</div>
+                                <div class="comment-action">Удалить</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="comment">
+                        <div class="avatar small" style="background-image: url(/api/placeholder/32/32);"></div>
+                        <div class="comment-content">
+                            <div class="comment-header">
+                                <div class="comment-author">Анна Козлова</div>
+                                <div class="comment-date">Вчера, 18:45</div>
+                            </div>
+                            <div class="comment-text">А будут ли еще размеры? Интересует XL.</div>
+                            <div class="comment-actions">
+                                <div class="comment-action">Ответить</div>
+                                <div class="comment-action">Скрыть</div>
+                                <div class="comment-action">Удалить</div>
+                            </div>
+                            
+                            <div class="comment-replies">
+                                <div class="comment">
+                                    <div class="avatar small" style="background-image: url(/api/placeholder/32/32);"></div>
+                                    <div class="comment-content">
+                                        <div class="comment-header">
+                                            <div class="comment-author">Администратор</div>
+                                            <div class="comment-date">Вчера, 19:10</div>
+                                        </div>
+                                        <div class="comment-text">Здравствуйте! Да, размер XL появится в продаже в течение недели.</div>
+                                        <div class="comment-actions">
+                                            <div class="comment-action">Скрыть</div>
+                                            <div class="comment-action">Удалить</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <button class="button secondary" style="width: 100%; margin-top: 16px;">Показать больше комментариев</button>
+                </div>
+            </div>
+
+            <div class="section-title">Форматы контента</div>
+            
+            <div class="card">
+                <div class="card-content">
+                    <div class="menu-item-row" id="content-articles-btn">
+                        <div class="menu-item-icon" style="background-color: var(--system-teal);">📄</div>
+                        <div class="menu-item-content">
+                            <div class="menu-item-title">Статьи</div>
+                            <div class="menu-item-subtitle">Лонгриды и обзоры для пользователей</div>
+                        </div>
+                        <div class="menu-item-arrow">›</div>
+                    </div>
+                    
+                    <div class="menu-item-row" id="content-stories-btn">
+                        <div class="menu-item-icon" style="background-color: var(--system-pink);">📱</div>
+                        <div class="menu-item-content">
+                            <div class="menu-item-title">Истории и сюжеты</div>
+                            <div class="menu-item-subtitle">Короткие исчезающие истории</div>
+                        </div>
+                        <div class="menu-item-arrow">›</div>
+                    </div>
+                    
+                    <div class="menu-item-row" id="content-clips-btn">
+                        <div class="menu-item-icon" style="background-color: var(--system-orange);">🎬</div>
+                        <div class="menu-item-content">
+                            <div class="menu-item-title">Клипы</div>
+                            <div class="menu-item-subtitle">Короткие вертикальные видео</div>
+                        </div>
+                        <div class="menu-item-arrow">›</div>
+                    </div>
+                    
+                    <div class="menu-item-row" id="content-reports-btn">
+                        <div class="menu-item-icon" style="background-color: var(--system-blue);">📰</div>
+                        <div class="menu-item-content">
+                            <div class="menu-item-title">Репортажи</div>
+                            <div class="menu-item-subtitle">Трансляция событий в режиме онлайн</div>
+                        </div>
+                        <div class="menu-item-arrow">›</div>
+                    </div>
+                    
+                    <div class="menu-item-row" id="content-audio-btn">
+                        <div class="menu-item-icon" style="background-color: var(--system-purple);">🎵</div>
+                        <div class="menu-item-content">
+                            <div class="menu-item-title">Аудиозаписи</div>
+                            <div class="menu-item-subtitle">Управление музыкой и плейлистами</div>
+                        </div>
+                        <div class="menu-item-arrow">›</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="section-title">Инструменты</div>
+            
+            <div class="card">
+                <div class="card-content">
+                    <div class="menu-item-row" id="content-calendar-btn">
+                        <div class="menu-item-icon" style="background-color: var(--system-indigo);">📅</div>
+                        <div class="menu-item-content">
+                            <div class="menu-item-title">Календарь публикаций</div>
+                            <div class="menu-item-subtitle">Планирование контента на месяц вперед</div>
+                        </div>
+                        <div class="menu-item-arrow">›</div>
+                    </div>
+                    
+                    <div class="menu-item-row" id="content-templates-btn">
+                        <div class="menu-item-icon" style="background-color: var(--system-orange);">📋</div>
+                        <div class="menu-item-content">
+                            <div class="menu-item-title">Шаблоны публикаций</div>
+                            <div class="menu-item-subtitle">Готовые шаблоны для быстрого создания</div>
+                        </div>
+                        <div class="menu-item-arrow">›</div>
+                    </div>
+                    
+                    <div class="menu-item-row" id="content-analytics-btn">
+                        <div class="menu-item-icon" style="background-color: var(--system-green);">📊</div>
+                        <div class="menu-item-content">
+                            <div class="menu-item-title">Аналитика контента</div>
+                            <div class="menu-item-subtitle">Статистика по типам публикаций</div>
+                        </div>
+                        <div class="menu-item-arrow">›</div>
+                    </div>
+                    
+                    <div class="menu-item-row" id="content-moderation-btn">
+                        <div class="menu-item-icon" style="background-color: var(--system-red);">🛡️</div>
+                        <div class="menu-item-content">
+                            <div class="menu-item-title">Настройки модерации</div>
+                            <div class="menu-item-subtitle">Фильтры, правила, черный список</div>
+                        </div>
+                        <div class="menu-item-arrow">›</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Интеграции -->
+        <div id="integrations-section" class="section">
+            <div class="section-title">Интеграции</div>
+            
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">Подключенные сервисы</div>
+                </div>
+                <div class="card-content">
+                    <div class="integration-card">
+                        <div class="integration-info">
+                            <div class="integration-icon integration-make">M</div>
+                            <div>
+                                <div class="integration-name">Make.com</div>
+                                <div class="integration-status">Подключено</div>
+                            </div>
+                        </div>
+                        <label class="switch">
+                            <input type="checkbox" checked>
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                    
+                    <div class="integration-card">
+                        <div class="integration-info">
+                            <div class="integration-icon integration-pipedream">P</div>
+                            <div>
+                                <div class="integration-name">Pipedream</div>
+                                <div class="integration-status">Подключено</div>
+                            </div>
+                        </div>
+                        <label class="switch">
+                            <input type="checkbox" checked>
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                    
+                    <div class="integration-card">
+                        <div class="integration-info">
+                            <div class="integration-icon" style="background-color: #3F80EA; color: white;">G</div>
+                            <div>
+                                <div class="integration-name">Google Sheets</div>
+                                <div class="integration-status">Не подключено</div>
+                            </div>
+                        </div>
+                        <label class="switch">
+                            <input type="checkbox">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                    
+                    <div class="integration-card">
+                        <div class="integration-info">
+                            <div class="integration-icon" style="background-color: #4CAF50; color: white;">A</div>
+                            <div>
+                                <div class="integration-name">Airtable</div>
+                                <div class="integration-status">Не подключено</div>
+                            </div>
+                        </div>
+                        <label class="switch">
+                            <input type="checkbox">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="section-title">Настройки Make.com</div>
+            
+            <div class="card">
+                <div class="card-content">
+                    <div class="form-group">
+                        <label class="form-label">API Ключ Make.com</label>
+                        <input type="text" class="form-input" value="mak_5f7e8d9c2a3b1c4d5e6f7g8h9i0j1k2l" placeholder="Введите ваш API ключ">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Webhook URL</label>
+                        <input type="text" class="form-input" value="https://hook.make.com/6a7b8c9d0e1f2g3h4i5j6k7l8m9n0o1p" placeholder="https://hook.make.com/your-webhook">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Интервал синхронизации</label>
+                        <select class="form-input">
+                            <option selected>В реальном времени</option>
+                            <option>Каждый час</option>
+                            <option>Раз в день</option>
+                            <option>Раз в неделю</option>
